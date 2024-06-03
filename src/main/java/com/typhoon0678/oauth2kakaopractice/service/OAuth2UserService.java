@@ -13,13 +13,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
+import com.typhoon0678.oauth2kakaopractice.domain.User;
+import com.typhoon0678.oauth2kakaopractice.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+@RequiredArgsConstructor
 @Service
 @Log4j2
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
-	private static final Logger logger = LoggerFactory.getLogger(OAuth2UserService.class);
+	private final Logger logger = LoggerFactory.getLogger(OAuth2UserService.class);
+	private final UserRepository userRepository;
 
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -41,6 +47,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 			.getUserNameAttributeName();
 
 		// DB 저장로직이 필요하면 추가
+		Map<String, String> properties = (Map<String, String>) attributes.get("properties");
+		String nickname = properties.get("nickname");
+		if (!userRepository.existsByUsername(nickname)) {
+			userRepository.save(User.builder().username(nickname).build());
+		}
 
 		return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
 	}

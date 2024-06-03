@@ -12,5 +12,9 @@ public class UserService {
 
 	private final UserRepository userRepository;
 
+	public String getKakaoAccessToken(String code) {
+
+		return null;
+	}
 
 }
